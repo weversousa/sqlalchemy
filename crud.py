@@ -1,11 +1,13 @@
-from sqlalchemy import create_engine, or_, func, case
+from sqlalchemy import create_engine, func, case
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError, OperationalError
 
 from models import Estado, Cidade
 
+#  Conecta-se ao banco de dados SQLite, se não existir ele será criado
 engine = create_engine('sqlite:///brasil.db')
 
+# A "session" é quem manipula a "engine", podem ser criadas várias "sessions"
 Session = sessionmaker(engine)
 session = Session()
 
@@ -176,7 +178,7 @@ try:
     '''
     list_cidade = (
         session.query(Cidade.nome, Cidade.uf)
-        .filter(or_(Cidade.uf == 'sc', Cidade.uf == 'mg'))
+        .filter((Cidade.uf == 'sc') | (Cidade.uf == 'mg'))
         .all()
     )
 
@@ -387,3 +389,47 @@ except OperationalError:
     print('Banco e/ou tabela não encontrados. Verificar string de conexão ')
 finally:
     print('-' * 80)
+
+
+# UPDATE
+
+try:
+    '''
+    UPDATE cidades
+       SET 'ribeirão preto'
+     WHERE nome = 'araçatuba'
+    '''
+    list_cidade = session.query(Cidade).filter(Cidade.nome == 'araçatuba').all()
+    
+    for cidade in list_cidade:
+        cidade.nome = 'ribeirão preto'
+        cidade.fundacao = None
+
+    session.commit()
+except OperationalError:
+    print('Banco e/ou tabela não encontrados. Verificar string de conexão ')
+
+
+# DELETE
+
+try:
+    '''
+    DELETE
+      FROM cidades
+     WHERE id == 1
+    '''
+    session.delete(session.query(Cidade).get(1))  # get busca pela primary key
+    session.commit()
+except OperationalError:
+    print('Banco e/ou tabela não encontrados. Verificar string de conexão ')
+
+try:
+    '''
+    DELETE
+      FROM cidades
+     WHERE nome == 'brotas'
+    '''
+    session.query(Cidade).filter(Cidade.nome == 'brotas').delete()
+    session.commit()
+except OperationalError:
+    print('Banco e/ou tabela não encontrados. Verificar string de conexão ')
