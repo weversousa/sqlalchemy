@@ -1,11 +1,12 @@
+from datetime import datetime
+
 from sqlalchemy import (
     create_engine, Column, Integer, String, Date, PrimaryKeyConstraint,
     UniqueConstraint
 )
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
 
-engine = create_engine('sqlite:///mundo.db')
+engine = create_engine('sqlite:///brasil.db')
 
 Base = declarative_base()
 
