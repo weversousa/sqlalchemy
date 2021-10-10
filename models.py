@@ -8,6 +8,10 @@ from sqlalchemy.ext.declarative import declarative_base
 
 engine = create_engine('sqlite:///brasil.db')
 
+'''
+Classe base com configurações necessárias para criar as tabelas no
+Banco de Dados, que servirá de Herança para nossas Classes
+'''
 Base = declarative_base()
 
 
@@ -49,5 +53,5 @@ class Cidade(Base):
         return fundacao
 
 if __name__ == '__main__':
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)
+    Base.metadata.drop_all(engine)  # Excluirá todas as tabelas
+    Base.metadata.create_all(engine)  # Criará todas as tabelas
