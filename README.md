@@ -10,3 +10,13 @@ Para essa interpretação acontecer é necessário ser uma linguagem que aplique
 
 Uma Classe em Python vai representar uma Tabela no Banco de Dados Relacional, e
 um Objeto em Python representa uma Tupla (Linha) de um registro de uma Tabale.
+
+## Subqueries
+
+Caso retorne somente 1 Coluna e 1 Linha
+
+    .scalar_subquery()
+
+Para os demais retornos
+
+    .subquery()

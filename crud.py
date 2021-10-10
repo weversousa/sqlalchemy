@@ -36,7 +36,8 @@ try:
     '''
     session.add_all([
         Estado(nome='bahia', uf='ba'),
-        Estado(nome='rio de janeiro', uf='rj')
+        Estado(nome='rio de janeiro', uf='rj'),
+        Estado(nome='pernambuco', uf='pe'),
     ])
     session.commit()
 except OperationalError:
@@ -49,13 +50,16 @@ except IntegrityError:
 try:
     session.add_all([
         Cidade(nome='osasco', uf='sp', fundacao='1962-02-19'),
+        Cidade(nome='olinda', uf='pe', fundacao=None),
         Cidade(nome='salvador', uf='ba', fundacao='1549-03-29'),
         Cidade(nome='florianópolis', uf='sc', fundacao='1673-03-23'),
         Cidade(nome='araçatuba', uf='sp', fundacao='1908-12-02'),
+        Cidade(nome='recife', uf='pe', fundacao='1537-03-12'),
         Cidade(nome='feira de santana', uf='ba', fundacao='1833-09-18'),
         Cidade(nome='brotas', uf='sp', fundacao='1839-05-03'),
         Cidade(nome='belo horizonte', uf='mg', fundacao=None),
-        Cidade(nome='brotas', uf='ba', fundacao=None),
+        Cidade(nome='caruaru', uf='pe', fundacao=None),
+        Cidade(nome='petrolina', uf='pe', fundacao=None),
     ])
     session.commit()
 except OperationalError:
@@ -198,6 +202,44 @@ try:
     list_cidade = (
         session.query(Cidade.nome)
         .filter(Cidade.nome.like('%santana%'))
+        .all()
+    )
+
+    for cidade in list_cidade:
+        print(cidade)
+except OperationalError:
+    print('Banco e/ou tabela não encontrados. Verificar string de conexão ')
+finally:
+    print('-' * 80)
+
+try:
+    '''
+    SELECT nome
+      FROM cidades
+     WHERE fundacao IS NULL
+    '''
+    list_cidade = (
+        session.query(Cidade.nome, Cidade.fundacao)
+        .filter(Cidade.fundacao.is_(None))
+        .all()
+    )
+
+    for cidade in list_cidade:
+        print(cidade)
+except OperationalError:
+    print('Banco e/ou tabela não encontrados. Verificar string de conexão ')
+finally:
+    print('-' * 80)
+
+try:
+    '''
+    SELECT nome
+      FROM cidades
+     WHERE fundacao IS NOT NULL
+    '''
+    list_cidade = (
+        session.query(Cidade.nome, Cidade.fundacao)
+        .filter(Cidade.fundacao.isnot(None))
         .all()
     )
 
@@ -390,6 +432,33 @@ except OperationalError:
 finally:
     print('-' * 80)
 
+try:
+    '''
+    SELECT nome, uf
+      FROM estados
+     WHERE uf = (
+                 SELECT uf
+                 FROM cidades
+                 GROUP BY uf
+                 HAVING COUNT('*') > 3
+                )
+    '''
+    list_cidade = (
+        session.query(Estado.nome, Estado.uf)
+        .filter(Estado.uf == (
+                              session.query(Cidade.uf)
+                              .group_by(Cidade.uf)
+                              .having(func.count('*') > 3)
+                              .scalar_subquery()
+                              )
+                ).all()
+    )
+
+    for cidade in list_cidade:
+        print(cidade)
+except OperationalError:
+    print('Banco e/ou tabela não encontrados. Verificar string de conexão ')
+
 
 # UPDATE
 
@@ -399,8 +468,10 @@ try:
        SET 'ribeirão preto'
      WHERE nome = 'araçatuba'
     '''
-    list_cidade = session.query(Cidade).filter(Cidade.nome == 'araçatuba').all()
-    
+    list_cidade = (
+        session.query(Cidade).filter(Cidade.nome == 'araçatuba').all()
+    )
+
     for cidade in list_cidade:
         cidade.nome = 'ribeirão preto'
         cidade.fundacao = None
