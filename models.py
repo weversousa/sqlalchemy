@@ -6,7 +6,9 @@ from sqlalchemy import (
 )
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:///brasil.db')
+
+#  Conecta-se ao banco de dados SQLite, se não existir ele será criado
+engine = create_engine('sqlite:///database/brasil.db')
 
 '''
 Classe base com configurações necessárias para criar as tabelas no
@@ -51,6 +53,7 @@ class Cidade(Base):
         if fundacao:
             return datetime.strptime(fundacao, '%Y-%m-%d')
         return fundacao
+
 
 if __name__ == '__main__':
     Base.metadata.drop_all(engine)  # Excluirá todas as tabelas

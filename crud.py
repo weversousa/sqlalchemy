@@ -1,11 +1,9 @@
-from sqlalchemy import create_engine, func, case
+from sqlalchemy import func, case
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError, OperationalError
 
-from models import Estado, Cidade
+from models import Estado, Cidade, engine
 
-#  Conecta-se ao banco de dados SQLite, se não existir ele será criado
-engine = create_engine('sqlite:///brasil.db')
 
 # A "session" é quem manipula a "engine", podem ser criadas várias "sessions"
 Session = sessionmaker(engine)
